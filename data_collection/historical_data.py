@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 conn = psycopg2.connect(
     dbname="ryanair_pricing",
     user="postgres",
-    password="yourpassword",
+    password="Varunanand123",
     host="localhost"
 )
 cursor = conn.cursor()
