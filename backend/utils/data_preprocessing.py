@@ -44,16 +44,20 @@ def preprocess_data(df):
     # Feature Engineering
     df['days_to_departure'] = (df['departure_time'] - datetime.now()).dt.days
     df['hour_of_day'] = df['departure_time'].dt.hour
-    df['origin_code'] = df['origin'].astype('category').cat.codes
-    df['destination_code'] = df['destination'].astype('category').cat.codes
-    df['aircraft_code'] = df['aircraft_type'].astype('category').cat.codes
+
+    # One-Hot Encoding for categorical variables
+    df = pd.get_dummies(df, columns=['origin', 'destination', 'aircraft_type'], drop_first=True)
 
     # Fill missing values without using inplace
     df['avg_price'] = df['avg_price'].fillna(df['avg_price'].mean())
     df['competitor_avg_price'] = df['competitor_avg_price'].fillna(df['competitor_avg_price'].mean())
 
     # Target Variable: avg_price
-    X = df[['days_to_departure', 'hour_of_day', 'origin_code', 'destination_code', 'aircraft_code', 'total_bookings', 'competitor_count', 'competitor_avg_price']]
+    feature_columns = ['days_to_departure', 'hour_of_day', 'total_bookings', 'competitor_count', 'competitor_avg_price']
+    # Add all one-hot encoded columns
+    feature_columns += [col for col in df.columns if col.startswith('origin_') or col.startswith('destination_') or col.startswith('aircraft_type_')]
+
+    X = df[feature_columns]
     y = df['avg_price']
 
     return X, y
